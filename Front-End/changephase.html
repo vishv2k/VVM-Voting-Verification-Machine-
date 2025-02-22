@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Best Actor Contest</title>
+
+    <!-- Fonts and icons -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <!-- CSS Files -->
+    <link href="./css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
+</head>
+<body>
+    
+    <div class="wrapper">
+        <div class="sidebar" data-color="green" data-background-color="white" data-image="./assets/img/sidebar-1.jpg">
+            <div class="sidebar-wrapper">
+                <ul class="nav" style="margin-top: 50px;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="candidatedetails.html">
+                            <i class="material-icons">info</i>
+                            <p>Candidate Details</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="addcandidate.html">
+                            <i class="material-icons">person_add</i>
+                            <p>Add Candidate</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admindashboard.html">
+                            <i class="material-icons">how_to_reg</i>
+                            <p>Register</p>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">
+                            <i class="material-icons">published_with_changes</i>
+                            <p>Change Phase</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="userpage.html">
+                            <i class="material-icons">logout</i>
+                            <p>LogOut</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="main-panel">
+            <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top">
+                <div class="container-fluid">
+                    <div class="navbar-wrapper">
+                        <a class="navbar-brand" href="javascript:void(0);"></a>
+                    </div>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="navbar-toggler-icon icon-bar"></span>
+                        <span class="navbar-toggler-icon icon-bar"></span>
+                        <span class="navbar-toggler-icon icon-bar"></span>
+                    </button>
+                </div>
+            </nav>
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header card-header-success">
+                                    <h4 class="card-title">CHANGE PHASE</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert">
+                                        <span id="currentPhaseAdmin"></span>
+                                    </div>
+                                    <button type="button" class="btn btn-success" onclick="changePhase('registration')">Registration Phase</button>
+                                    <button type="button" class="btn btn-warning" onclick="changePhase('voting')">Voting Phase</button>
+                                    <button type="button" class="btn btn-danger" onclick="changePhase('result')">Result Phase</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+        const phaseText = document.getElementById("currentPhaseAdmin");
+
+        async function getCurrentPhase() {
+            try {
+                const response = await fetch("http://localhost:3001/api/currentPhase");
+                const data = await response.json();
+
+                if (response.ok) {
+                    updatePhaseUI(data.phase);
+                } else {
+                    console.error("Failed to fetch current phase:", data.error);
+                }
+            } catch (error) {
+                console.error("Error fetching current phase:", error);
+            }
+        }
+
+        function updatePhaseUI(phase) {
+            let message = "";
+            switch (phase) {
+                case "registration":
+                    message = "Registration is Active!";
+                    phaseText.className = "alert alert-primary";
+                    break;
+                case "voting":
+                    message = "Voting is Active!";
+                    phaseText.className = "alert alert-warning";
+
+                    break;
+                case "result":
+                    message = "Result is Active!";
+                    phaseText.className = "alert alert-danger";
+                    break;
+                default:
+                    message = "Unknown phase!";
+                    phaseText.className = "alert alert-secondary";
+            }
+            phaseText.textContent = message;
+        }
+
+        async function changePhase(phase) {
+            try {
+                const response = await fetch("http://localhost:3001/api/updatePhase", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ newPhase: phase })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(`Phase updated to: ${phase.toUpperCase()}`);
+                    updatePhaseUI(phase);
+                } else {
+                    alert("Error updating phase: " + data.error);
+                }
+            } catch (error) {
+                console.error("Error updating phase:", error);
+                alert("An error occurred while updating the phase.");
+            }
+        }
+
+        window.changePhase = changePhase;
+
+        getCurrentPhase();
+    });
+
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="js/web3.min.js"></script>
+<script src="js/truffle-contract.js"></script>
+
+</body>
+</html>

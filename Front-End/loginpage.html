@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./UserCSS/signuppage.css" />
+    <title>Login Page</title>
+</head>
+<body>
+      <div class="container">
+        <div class="forms-container">
+          <div class="signin-signup">
+            <form id="loginForm">
+              <h2 class="title">Sign in</h2>
+
+              <div class="input-field">
+                <i class="fas fa-user"></i>
+                <input type="text" id="email" placeholder="Email Address" required />
+              </div>
+              <div class="input-field">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Password" required />
+                <i class="fas fa-eye" id="toggle-password" onclick="toggleVisibility('password', this)"></i>
+              </div>
+              <input type="submit" value="Login" class="btn solid" />
+            </form>   
+            <p id="loginMessage" style="color: red;"></p>
+          </div>
+        </div>
+
+        <div class="panels-container">
+          <div class="panel left-panel">
+            <div class="content">
+              <h3>New here?</h3>
+              <p>
+                If you haven't signed up, what are you waiting for?
+              </p>
+              <a href="./signuppage.html"><button class="btn transparent" id="sign-up-btn">
+                Sign up
+              </button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<script>
+    
+        function toggleVisibility(fieldId, icon) {
+          const field = document.getElementById(fieldId);
+          if (field.type === "password") {
+            field.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+          } else {
+            field.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+          }
+        }
+
+        // Handle login form submission
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            const response = await fetch('http://localhost:3001/login', {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ email, password }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              localStorage.setItem('email',email);
+              alert(result.message); // Successful login
+              window.location.href = "userinfo.html"; // Redirect to userinfo.html
+            } else {
+              alert(result.message); // Display error message (e.g., invalid password, user not found)
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred. Please try again later.");
+          }
+        });
+
+</script>
+
+</body>
+</html>

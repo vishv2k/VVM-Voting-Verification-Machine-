@@ -1,0 +1,204 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification</title>
+
+    <style>
+
+          body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          }
+
+          .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+          }
+
+          h4 {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 15px;
+          }
+
+          #timer {
+            font-size: 16px;
+            color: #d9534f;
+            font-weight: bold;
+            margin-bottom: 15px;
+          }
+
+          input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            text-align: center;
+          }
+
+          button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+          }
+
+          .btn-info {
+            background-color: #17a2b8;
+            color: white;
+          }
+
+          .btn-info:hover {
+            background-color: #138496;
+          }
+
+          #resendBtn {
+            margin-top: 10px;
+            display: none; 
+          }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+      <h4>We have sent a verification code to your email.</h4>
+      <div id="timer">Time left: 60s</div>
+
+      <form id="otpForm">
+        <input type="text" id="otp" placeholder="Enter OTP" required />
+        <button type="button" id="verifyBtn" class="btn btn-info" onclick="verifyOTP()">Check Code</button>
+      </form>
+
+      <div>
+        <button id="resendBtn" class="btn btn-info" onclick="resendOTP()">Resend OTP</button>
+      </div>
+    </div>
+
+<script>
+
+        let otpTimer;
+        let timeLeft = 60;
+
+        function startTimer() {
+          otpTimer = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+          const timerDisplay = document.getElementById('timer');
+          const verifyBtn = document.getElementById('verifyBtn');
+          const resendBtn = document.getElementById('resendBtn');
+
+          if (timeLeft <= 0) {
+            clearInterval(otpTimer);
+            timerDisplay.innerText = 'OTP expired!';
+            verifyBtn.disabled = true;
+            verifyBtn.style.display = 'none'; 
+            resendBtn.style.display = 'inline-block';
+          } else {
+            timerDisplay.innerText = `Time left: ${timeLeft}s`;
+            timeLeft--;
+          }
+        }
+              
+        async function verifyOTP() {
+          const otp = document.getElementById('otp').value.trim();
+          const email = localStorage.getItem('email');  
+
+          try {
+            const response = await fetch('http://localhost:3001/verify-otp', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, otp }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {  
+              alert('OTP verified successfully!');
+              setTimeout(() => {
+                window.location.href = 'voteregister.html?message=success';  
+              }, 500); 
+            } else {
+              alert(data.message || 'Verification failed');
+            }
+          } catch (error) {
+            alert('Error verifying OTP.');
+            console.error('Error:', error);
+          }
+        }
+
+        async function resendOTP() {
+          const email = localStorage.getItem('email');  
+
+          if (!email) {
+            alert('User email not found. Please register or log in.');
+            return;
+          }
+
+          try {
+            const response = await fetch('http://localhost:3001/resend-otp', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              alert('OTP resent successfully!');
+              timeLeft = 60;  
+              startTimer();   
+
+              const verifyBtn = document.getElementById('verifyBtn');
+              const resendBtn = document.getElementById('resendBtn');
+
+              verifyBtn.disabled = false;
+              verifyBtn.style.display = 'inline-block'; 
+              resendBtn.style.display = 'none'; 
+
+              const timerDisplay = document.getElementById('timer');
+              timerDisplay.innerText = `Time left: ${timeLeft}s`;
+            } else {
+              alert(data.message || 'Error resending OTP');
+            }
+          } catch (error) {
+            alert('Error resending OTP. Please try again.');
+            console.error('Resend OTP error:', error);
+          }
+        }
+
+        document.getElementById('otp').addEventListener('keypress', function (event) {
+          if (event.key === 'Enter') {
+            event.preventDefault(); 
+            verifyOTP();
+          }
+        });
+
+        window.onload = () => {
+          const resendBtn = document.getElementById('resendBtn');
+          resendBtn.style.display = 'none'; 
+          startTimer();
+        };
+
+</script>
+
+</body>
+</html>

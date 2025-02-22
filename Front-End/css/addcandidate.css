@@ -1,0 +1,30 @@
+/* Before uploading (default button style) */
+    .btn-inactive {
+        color: #fff;
+        background-color: #212529; /* Default dark color */
+        border-color: #212529;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn-inactive:hover {
+        background-color: #f8f9fa; /* Light white on hover */
+        color: #212529;
+    }
+
+    /* After uploading (success style) */
+    .btn-success {
+        color: #fff;
+        background-color: #28a745; /* Green */
+        border-color: #28a745;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn-success:hover {
+        background-color: #218838; /* Darker green on hover */
+        border-color: #1e7e34;
+    }
+

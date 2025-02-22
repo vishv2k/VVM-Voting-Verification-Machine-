@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Best Actor Contest</title>
+
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <!-- CSS Files -->
+    <link href="./css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
+</head>
+
+<body>
+
+    <div class="wrapper ">
+        <div class="sidebar" data-color="green" data-background-color="white" data-image="./assets/img/sidebar-1.jpg">
+            <div class="sidebar-wrapper">
+              <ul class="nav" style="margin-top: 50px;">
+                <li class="nav-item">
+                  <a class="nav-link" href="candidatedetails.html">
+                    <i class="material-icons">info</i>
+                    <p>Candidate Details</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="addcandidate.html">
+                    <i class="material-icons">person_add</i>
+                    <p>Add Candidate</p>
+                  </a>
+                </li>
+                <li class="nav-item active">
+                  <a class="nav-link" href="#">
+                    <i class="material-icons">how_to_reg</i>
+                    <p>Register</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="changephase.html">
+                    <i class="material-icons">published_with_changes</i>
+                    <p>Change Phase</p>
+                  </a>
+                </li>
+                <li class="nav-item ">
+                  <a class="nav-link" href="userpage.html">
+                    <i class="material-icons">logout</i>
+                    <p>LogOut</p>
+                  </a>
+                </li>
+              </ul>
+            </div>
+        </div>
+        <div class="main-panel">
+          <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+              <div class="navbar-wrapper">
+                <a class="navbar-brand" href="javascript:;"></a>
+              </div>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon icon-bar"></span>
+                <span class="navbar-toggler-icon icon-bar"></span>
+                <span class="navbar-toggler-icon icon-bar"></span>
+              </button>
+            </div>
+          </nav>
+    
+          <div class="content">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="card">
+                    <div class="card-header card-header-success">
+                      <h4 class="card-title">Voter Registration</h4>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <table class="table">
+                                <tr>
+                                    <th>S.N</th>
+                                    <th>Account address</th>
+                                    <th>Is registered</th>
+                
+                                </tr>  
+                            </table>
+                        </div>
+                        <form onsubmit="App.registerVoter(); return false;">
+                            <div class="form-group">
+                              <br>
+                              <input type="text" class="form-control" id="accadd" placeholder="Please Enter Voter Account Address here.." required>
+                            </div>
+                            <br>
+                            <button type="submit" class="btn btn-success">Register</button>
+                        </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="js/web3.min.js"></script>
+<script src="js/truffle-contract.js"></script>
+
+<script>
+
+        async function fetchRegisteredUsers() {
+          try {
+            const response = await fetch("http://localhost:3001/getRegisteredUsers");
+            const registeredUsers = await response.json();
+
+            const tableBody = document.querySelector("table tbody");
+            tableBody.innerHTML = ""; 
+
+            registeredUsers.forEach((user, index) => {
+              const row = document.createElement("tr");
+
+              row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${user.accountAddress}</td>
+                <td>${user.isVerified ? "Yes" : "No"}</td>
+              `;
+
+              tableBody.appendChild(row);
+            });
+          } catch (error) {
+            console.error("Error fetching registered users:", error);
+          }
+        }
+
+        async function registerVoter() {
+          const accountAddress = document.getElementById('accadd').value.trim();
+          
+          const response = await fetch("http://localhost:3001/getRegisteredUsers");
+          const registeredUsers = await response.json();
+          
+          let isRegistered = false;
+
+          registeredUsers.forEach(user => {
+            if (user.accountAddress === accountAddress) {
+              isRegistered = true;
+            }
+          });
+
+          let messageElement = document.querySelector('.card-body p');
+          if (!messageElement) {
+            messageElement = document.createElement('p');
+            document.querySelector('.card-body').appendChild(messageElement);
+          }
+
+          if (isRegistered) {
+            messageElement.style.color = 'green';
+            messageElement.innerHTML = `User registered successfully with account: ${accountAddress}`;
+          } else {
+            messageElement.style.color = 'red';
+            messageElement.innerHTML = 'User is not registered';
+          }
+
+          document.getElementById('accadd').value = '';
+        }
+
+        document.querySelector('form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          registerVoter(); 
+        });
+
+        document.addEventListener("DOMContentLoaded", fetchRegisteredUsers);
+
+          document.querySelectorAll('.table tr').forEach((row) => {
+          row.addEventListener('click', () => {
+            const accountAddress = row.cells[1].innerText;
+            document.getElementById('accadd').value = accountAddress;
+          });
+        });
+
+        document.querySelector('form').addEventListener('submit', (e) => {
+          e.preventDefault();
+
+          const accountAddress = document.getElementById('accadd').value.trim();
+          document.querySelector('.card-body').insertAdjacentHTML(
+            'beforeend',
+            `<p style="color: green;">User registered successfully with account: ${accountAddress}</p>`
+          );
+        });
+
+</script>
+
+</body>
+</html>

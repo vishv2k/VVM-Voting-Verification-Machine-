@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="css/adminstyle.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+  <style>
+        .pin-box {
+          display: none;
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          text-align: center;
+          max-width: 300px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        .pin-box h3 {
+          margin-bottom: 15px;
+          font-size: 18px;
+          font-weight: 500;
+          color: #333;
+        }
+
+        .pin-box input {
+          width: 80%;
+          padding: 10px;
+          margin-bottom: 15px;
+          font-size: 16px;
+          text-align: center;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
+
+        .pin-box button {
+          background-color: #17a2b8;
+          color: white;
+          padding: 10px 15px;
+          font-size: 16px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+
+        .pin-box button:hover {
+          background-color: #138496;
+        }
+
+  </style>
+</head>
+
+<body>
+
+      <div class="center" id="mainForm">
+        <div class="header">Login Form</div>
+        <form id="loginForm">
+          <input type="text" placeholder="Email or Username" name="email" id="email" required />
+          <i class="far fa-envelope"></i>
+          <input id="password" type="password" placeholder="Password" name="password" required />
+          <i class="fas fa-lock" onclick="showPassword()"></i>
+          <input type="submit" value="Login">
+          <a href="#">Forgot Password?</a>
+        </form>
+      </div>
+
+      <div class="pin-box" id="pinBox">
+        <h3>Enter 4-digit PIN</h3>
+        <input type="password" id="pin" maxlength="4" required />
+        <button onclick="validatePin()">Submit</button>
+      </div>
+
+<script>
+
+        correctEmail = "vvm@gmail.com";
+        const correctPassword = "vvm@123!";
+        const correctPin = "2030";
+
+        function showPassword() {
+          const passwordField = document.getElementById('password');
+          const icon = document.querySelector('.fas');
+          if (passwordField.type === "password") {
+            passwordField.type = "text";
+            icon.style.color = "#7f2092";
+          } else {
+            passwordField.type = "password";
+            icon.style.color = "grey";
+          }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+          event.preventDefault();
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+
+          if (email === correctEmail && password === correctPassword) {
+            document.getElementById('mainForm').classList.add('blur');
+            document.getElementById('pinBox').style.display = 'block';
+          } else if (email !== correctEmail) {
+            alert('User not found. Please check your email.');
+          } else {
+            alert('Invalid password. Please try again.');
+          }
+        });
+
+        async function validatePin() {
+          const pin = document.getElementById('pin').value;
+          const desiredAccount = "0x6F1F72e994a09474125c062FEF871a8425F273cA".toLowerCase(); // Admin account from Ganache
+
+          if (pin === correctPin) {
+            alert('Welcome Admin!');
+            
+            if (typeof window.ethereum !== 'undefined') {
+              try {
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                const connectedAccount = accounts[0].toLowerCase();
+
+                if (connectedAccount === desiredAccount) {
+                  alert(`MetaMask connected to the correct admin account`);
+                  window.location.href = "addcandidate.html";
+                } else {
+                  alert(`MetaMask connected to a different account. Please switch to the correct account.`);
+                }
+              } catch (error) {
+                console.error('Error connecting to MetaMask:', error);
+                alert('Failed to connect to MetaMask. Please try again.');
+              }
+            } else {
+              alert('MetaMask is not installed. Please install MetaMask to proceed.');
+            }
+          } else {
+            alert('Incorrect PIN. Please try again.');
+          }
+        }
+
+</script>
+
+</body>
+</html>

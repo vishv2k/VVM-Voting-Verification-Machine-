@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Best Actor Contest</title>
+
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <!-- CSS Files -->
+    <link href="css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
+</head>
+
+<body>
+
+    <div class="wrapper ">
+        <div class="sidebar" data-color="azure" data-background-color="white" data-image="./assets/img/sidebar-1.jpg">
+            <div class="sidebar-wrapper">
+              <ul class="nav" style="margin-top: 50px;">
+                  <li class="nav-item">
+                    <a class="nav-link" href="userinfo.html">
+                      <i class="material-icons">content_paste</i>
+                      <p>Information</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="voteregister.html">
+                      <i class="material-icons">check_box</i>
+                      <p>Voter Registeration</p>
+                    </a>
+                  </li>
+                  <li class="nav-item ">
+                    <a class="nav-link" href="votingarea.html">
+                      <i class="material-icons">how_to_vote</i>
+                      <p>Voting-Area</p>
+                    </a>
+                  </li>
+                  <li class="nav-item active">
+                    <a class="nav-link" href="#">
+                      <i class="material-icons">assessment</i>
+                      <p>Result</p>
+                    </a>
+                  </li>
+                  <li class="nav-item ">
+                    <a class="nav-link" href="userpage.html">
+                      <i class="material-icons">logout</i>
+                      <p>LogOut</p>
+                    </a>
+                  </li>
+              </ul>
+            </div>
+        </div>
+
+        <div class="main-panel">
+          <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+              <div class="navbar-wrapper">
+                <a class="navbar-brand" href="javascript:;"></a>
+              </div>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon icon-bar"></span>
+                <span class="navbar-toggler-icon icon-bar"></span>
+                <span class="navbar-toggler-icon icon-bar"></span>
+              </button>
+            </div>
+          </nav>
+		    <div class="content">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="card">
+                    <div class="card-header card-header-info">
+                      <h4 class="card-title">Results</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="not">
+                            <h1>Election is Not Over Yet!!!!!</h1>
+                        </div>
+                        <div id="renderTable">
+                            <table class="table">
+                                <thead>
+                                  <th scope="col">#</th>
+                                  <th scope="col">Name</th>
+                                  <th scope="col">Age</th>
+                                  <th scope="col">Party</th>
+                                  <th scope="col">Qualification</th>
+                                  <th scope="col">Votes</th>
+                                </thead>
+                                <tbody id="Results">
+                      
+                                </tbody>
+                                <hr/>
+                                <p id="accountAddress" class="text-center"></p>
+                              </table>
+                        </div>   
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      </div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", async () => {
+    const resultsTable = document.getElementById("Results");
+    const notOverMessage = document.getElementById("not");
+    const resultsContainer = document.getElementById("renderTable");
+
+    try {
+        const phaseResponse = await fetch("http://localhost:3001/api/currentPhase");
+        const phaseData = await phaseResponse.json();
+        
+        if (phaseData.phase !== "result") {
+            notOverMessage.style.display = "block";
+            resultsContainer.style.display = "none";
+            return;
+        }
+        
+        notOverMessage.style.display = "none";
+        resultsContainer.style.display = "block";
+
+        const response = await fetch("http://localhost:3001/resultcandidates");
+        const candidates = await response.json();
+
+        if (candidates.length === 0) {
+            notOverMessage.style.display = "block";
+            resultsContainer.style.display = "none";
+            return;
+        }
+
+        resultsTable.innerHTML = candidates
+            .map((candidate, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${candidate.name}</td>
+                    <td>${candidate.age}</td>
+                    <td>${candidate.party}</td>
+                    <td>${candidate.qualification}</td>
+                    <td>${candidate.votes}</td>
+                </tr>
+            `)
+            .join("");
+    } catch (error) {
+        console.error("Error fetching results or phase status:", error);
+    }
+
+    fetchResults();
+
+    setInterval(fetchResults, 1000);
+});
+
+</script>
+  
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="js/web3.min.js"></script>
+<script src="js/truffle-contract.js"></script>
+
+</body>
+</html>

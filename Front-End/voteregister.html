@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Best Actor Contest</title>
+
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- CSS Files -->
+    <link href="css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="sidebar" data-color="azure" data-background-color="white" data-image="./assets/img/sidebar-1.jpg">
+            <div class="sidebar-wrapper">
+                <ul class="nav" style="margin-top: 50px;">
+                    <li class="nav-item">
+                        <a class="nav-link" href="userinfo.html">
+                            <i class="material-icons">content_paste</i>
+                            <p>Information</p>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">
+                            <i class="material-icons">check_box</i>
+                            <p>Voter Registration</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="votingarea.html">
+                            <i class="material-icons">how_to_vote</i>
+                            <p>Voting-Area</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="result.html">
+                            <i class="material-icons">assessment</i>
+                            <p>Result</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="userpage.html">
+                            <i class="material-icons">logout</i>
+                            <p>LogOut</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-panel">
+            <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top">
+                <div class="container-fluid">
+                    <div class="navbar-wrapper">
+                        <a class="navbar-brand" href="javascript:;"></a>
+                    </div>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="navbar-toggler-icon icon-bar"></span>
+                        <span class="navbar-toggler-icon icon-bar"></span>
+                        <span class="navbar-toggler-icon icon-bar"></span>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="content">
+                <div class="container" style="width: 800px;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header card-header-info">
+                                    <h4 class="card-title">REGISTRATION</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form id="registerForm">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="form-outline">
+                                                    <br />
+                                                    <input type="text" id="aadharNo" class="form-control" name="aadharno" required />
+                                                    <label class="form-label" for="aadharNo">Aadhar Number</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="form-outline">
+                                                    <br />
+                                                    <input type="text" id="accountAddress" class="form-control" name="account_address" required />
+                                                    <label class="form-label" for="accountAddress">Account Address</label>
+                                                    <br>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <button type="submit" class="btn btn-info btn-block mb-4">Register</button>
+                                    </form>
+
+                                    <p id="successMessage" style="color: green; display: none;">User registered successfully!.</p>
+                                    <p style="color: red;" id="message"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("registerForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        console.log("Form submitted");
+        const aadharNo = document.getElementById("aadharNo").value;
+        const accountAddress = document.getElementById("accountAddress").value; 
+        const email = localStorage.getItem('email');
+
+        console.log({ aadharNo, accountAddress, email });
+
+        const aadharRegex = /^\d{12}$/; 
+        const accountRegex = /^0x[a-fA-F0-9]{40}$/; 
+        if (!aadharRegex.test(aadharNo)) {
+            document.getElementById("message").innerText = "Invalid Aadhar number format.";
+            document.getElementById("message").style.color = "red";
+            return;
+        }
+
+        if (!accountRegex.test(accountAddress)) {
+            document.getElementById("message").innerText = "Invalid MetaMask account address.";
+            document.getElementById("message").style.color = "red";
+            return;
+        }
+
+        if (!email) {
+            console.error("Email not found in localStorage.");
+            document.getElementById("message").innerText = "User email not found. Please log in again.";
+            return;
+            }
+
+            try {
+            const response = await fetch("http://localhost:3001/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ aadharNo, accountAddress, email }),
+            });
+
+            const data = await response.json();
+
+        if (response.ok) {
+            if (data.redirect) {
+            window.location.href = data.redirect;
+            } else {
+            setTimeout(() => {
+                alert("otp sent successfully to your gmail")
+                window.location.href = "emailverify.html";
+            }, 1000);
+            }
+        } else {
+            document.getElementById("message").innerText = data.message;
+        }
+        } catch (error) {
+        console.error("Error during fetch:", error);
+        document.getElementById("message").innerText = "An error occurred.";
+        }
+    });
+    });
+
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+            }
+
+        window.onload = () => {
+        const message = getQueryParam('message');
+        
+        if (message === 'success') {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+            successMessage.style.display = 'none';
+            }, 3000); 
+        }
+        }
+
+</script>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <title>Best Actor Contest</title>
+
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <!-- CSS Files -->
+    <link href="./css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
+    <link href="./css/addcandidate.css" rel="stylesheet" />
+
+    <style>
+
+          #loader {
+          display: none; /* Hidden by default */
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper ">
+      <div class="sidebar" data-color="green" data-background-color="white" data-image="./assets/img/sidebar-1.jpg">
+          <div class="sidebar-wrapper">
+            <ul class="nav" style="margin-top: 50px;">
+              <li class="nav-item">
+                <a class="nav-link" href="candidatedetails.html">
+                  <i class="material-icons">info</i>
+                  <p>Candidate Details</p>
+                </a>
+              </li>
+              <li class="nav-item active">
+                <a class="nav-link" href="#">
+                  <i class="material-icons">person_add</i>
+                  <p>Add Candidate</p>
+                </a>
+              </li>
+              <li class="nav-item ">
+                <a class="nav-link" href="admindashboard.html">
+                  <i class="material-icons">how_to_reg</i>
+                  <p>Register</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="changephase.html">
+                  <i class="material-icons">published_with_changes</i>
+                  <p>Change State</p>
+                </a>
+              </li>
+              <li class="nav-item ">
+                <a class="nav-link" href="userpage.html">
+                  <i class="material-icons">logout</i>
+                  <p>LogOut</p>
+                </a>
+              </li>
+            </ul>
+          </div>
+      </div>
+      <div class="main-panel">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+          <div class="container-fluid">
+            <div class="navbar-wrapper">
+              <a class="navbar-brand" href="javascript:;"></a>
+            </div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="navbar-toggler-icon icon-bar"></span>
+              <span class="navbar-toggler-icon icon-bar"></span>
+              <span class="navbar-toggler-icon icon-bar"></span>
+            </button>
+          </div>
+        </nav>
+  
+        <div class="content">
+          <div class="container" style="width: 800px">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card">
+                  <div class="card-header card-header-success">
+                    <h4 class="card-title">Add Candidate Information</h4>
+                  </div>
+                  <br/>
+                  <div class="card-body">
+                    <form onsubmit="addCandidate(); return false;">
+                      <div class="row mb-4">
+                        <div class="col">
+                          <div class="form-outline">
+                            <input type="text" id="name" class="form-control" required />
+                            <label class="form-label" for="form3Example1">Name</label>
+                          </div>
+                        </div>
+                        <div class="col">
+                          <div class="form-outline">
+                            <input type="text" id="party" class="form-control" required />
+                            <label class="form-label" for="form3Example2">Party</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row mb-4">
+                        <div class="col">
+                          <div class="form-outline">
+                            <input type="text" id="age" class="form-control" required />
+                            <label class="form-label" for="form3Example1">Age</label>
+                          </div>
+                        </div>
+                        <div class="col">
+                          <div class="form-outline">
+                            <input type="text" id="qualification" class="form-control" required />
+                            <label class="form-label" for="form3Example2">Qualification</label>
+                          </div>
+                        </div>
+                      </div>
+                      <button type="submit"  class="btn btn-success btn-block mb-4" >Add</button>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="alert alert-success" id="loader">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <!-- <i class="material-icons">close</i> -->
+                    </button>
+                    <span>
+                      <b> Candidate </b> has been added Successfully....!</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+</div>
+</div>
+  
+<script>
+
+      async function addCandidate() {
+        const name = document.getElementById("name").value;
+        const party = document.getElementById("party").value;
+        const age = parseInt(document.getElementById("age").value);
+        const qualification = document.getElementById("qualification").value;
+
+        if (age <= 18) {
+          alert("Age must be above 18 to add a candidate!");
+          return;
+        }
+
+        const candidateData = {
+          name,
+          party,
+          age,
+          qualification
+        };
+
+        try {
+          const response = await fetch('http://localhost:3001/addCandidate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(candidateData)
+          });
+
+          const data = await response.json();
+            if (response.ok) {
+              // Display success message
+              const successMessage = document.getElementById("loader");
+              successMessage.style.display = "block";
+
+              // Hide the success message after 3 seconds
+              setTimeout(() => {
+                successMessage.style.display = "none";
+              }, 2000);
+
+            } else {
+              alert(data.message);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while adding the candidate.');
+          }
+
+
+        // Clear form fields
+        document.getElementById("name").value = "";
+        document.getElementById("party").value = "";
+        document.getElementById("age").value = "";
+        document.getElementById("qualification").value = "";
+      }
+
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="js/web3.min.js"></script>
+<script src="js/truffle-contract.js"></script>
+
+</body>
+</html>
